@@ -1,0 +1,27 @@
+version: 0.2
+phases:
+ install:
+   runtime-versions:
+     java: corretto17
+ build:
+   commands:
+     - echo "Running SonarQube analysis..."
+     - mvn clean verify sonar:sonar \
+         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+         -Dsonar.host.url=$SONAR_HOST_URL \
+         -Dsonar.login=$SONARQUBE_TOKEN
+ post_build:
+   commands:
+     - echo "🔍 Checking SonarQube Quality Gate..."
+     - status=$(curl -s -u $SONARQUBE_TOKEN: \
+       "$SONAR_HOST_URL/api/qualitygates/project_status?projectKey=$SONAR_PROJECT_KEY" \
+       | jq -r '.projectStatus.status')
+     - if [ "$status" != "OK" ]; then
+         echo "SonarQube Quality Gate failed!";
+         exit 1;
+       else
+         echo "SonarQube Quality Gate passed!";
+       fi
+artifacts:
+ files:
+   - target/*.jar
