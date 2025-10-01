@@ -1,81 +1,9 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: "CodeCommit + CodeBuild + SonarQube Integration"
-Parameters:
- RepositoryName:
-   Type: String
-   Default: sonar-test-repo
- SonarQubeTokenSecretArn:
-   Type: String
-   Description: "arn:aws:secretsmanager:eu-north-1:790639215344:secret:sonar-test-secretkey-dlp0OV"
- SonarQubeUrl:
-   Type: String
-   Default: "http://51.20.255.106:9000/"
- SonarProjectKey:
-   Type: String
-   Default: "sonar-test"
-Resources:
- ### CodeCommit Repository ###
- MyRepo:
-   Type: AWS::CodeCommit::Repository
-   Properties:
-     RepositoryName: !Ref RepositoryName
-     RepositoryDescription: "Code repository integrated with SonarQube Quality Gate"
- ### IAM Role for CodeBuild ###
- CodeBuildServiceRole:
-   Type: AWS::IAM::Role
-   Properties:
-     RoleName: !Sub "${RepositoryName}-CodeBuildRole"
-     AssumeRolePolicyDocument:
-       Version: "2012-10-17"
-       Statement:
-         - Effect: Allow
-           Principal:
-             Service: codebuild.amazonaws.com
-           Action: sts:AssumeRole
-     ManagedPolicyArns:
-       - arn:aws:iam::aws:policy/AdministratorAccess
-     Policies:
-       - PolicyName: CodeBuildSecretsAccess
-         PolicyDocument:
-           Version: "2012-10-17"
-           Statement:
-             - Effect: Allow
-               Action:
-                 - secretsmanager:GetSecretValue
-               Resource: !Ref SonarQubeTokenSecretArn
- ### CodeBuild Project ###
- SonarBuildProject:
-   Type: AWS::CodeBuild::Project
-   Properties:
-     Name: !Sub "${RepositoryName}-sonar-build"
-     Source:
-       Type: CODECOMMIT
-       Location: !GetAtt MyRepo.CloneUrlHttp
-       BuildSpec: buildspec.yml
-     Environment:
-       ComputeType: BUILD_GENERAL1_SMALL
-       Image: aws/codebuild/standard:7.0
-       Type: LINUX_CONTAINER
-       EnvironmentVariables:
-         - Name: SONARQUBE_TOKEN
-           Type: SECRETS_MANAGER
-           Value: !Ref SonarQubeTokenSecretArn
-         - Name: SONAR_HOST_URL
-           Value: !Ref SonarQubeUrl
-         - Name: SONAR_PROJECT_KEY
-           Value: !Ref SonarProjectKey
-     ServiceRole: !GetAtt CodeBuildServiceRole.Arn
-     Artifacts:
-       Type: NO_ARTIFACTS
-  #   Triggers:
-  #     Webhook: true
-  #     FilterGroups:
-  #       - - Type: EVENT
-  #           Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED,PULL_REQUEST_REOPENED
-Outputs:
- RepositoryCloneUrl:
-   Description: "https://git-codecommit.eu-north-1.amazonaws.com/v1/repos/PullRequestApproverBlogDemo"
-   Value: !GetAtt MyRepo.CloneUrlHttp
- CodeBuildProjectName:
-   Description: "sonar-build-test"
-   Value: !Ref SonarBuildProject
+template-file-path: template.yaml
+parameters:
+  SonarProjectKey: sonar-test
+  SonarQubeTokenSecretArn: >-
+    arn:aws:secretsmanager:eu-north-1:790639215344:secret:sonar-test-secretkey-dlp0OV
+  RepositoryName: sonar-test-repo
+  SonarQubeUrl: http://51.20.255.106:9000/
+tags:
+  Name: Sonar-test
