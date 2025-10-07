@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.amazonaws.example</groupId>
-  <artifactId>PullRequestApproverBlogDemo</artifactId>
+  <artifactId>sonar-test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>PullRequestApproverBlogDemo</name>
+  <name>sonar-test</name>
   <description>A simple PullRequestApproverBlogDemo.</description>
   <url>https://github.com/aws-samples/aws-codecommit-pull-request-approver-demo</url>
 
@@ -72,6 +72,11 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.2</version>
         </plugin>
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>3.9.1.2184</version>
+      </plugin>
       </plugins>
     </pluginManagement>
   </build>
