@@ -1,8 +1,25 @@
 version: 0.2
+env:
+  secrets-manager:
+    LOGIN: sonartest-scm:sonartoken
+    HOST: sonartest-scm:HOST
+    Organization: sonartest-scm:Organization
+    Project: sonartest-scm:Project
 phases:
  install:
    runtime-versions:
      java: corretto17
+  pre_build:
+    commands:
+      - apt-get update
+      - pip3 install --upgrade awscli
+      - apt-get install -y jq
+      - wget https://dlcdn.apache.org/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz
+      - tar xzf apache-maven-3.9.11-bin.tar.gz
+      - ln -s apache-maven-3.9.11 maven
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.1.0.1829-linux.zip
+      - unzip ./sonar-scanner-cli-4.1.0.1829-linux.zip
+      - export PATH=$PATH:/sonar-scanner-4.1.0.1829-linux/bin/
  build:
    commands:
      - echo "Running SonarQube analysis..."
