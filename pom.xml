@@ -89,3 +89,6 @@
     </plugins>
   </reporting>
 </project>
+<properties>
+  <sonar.organization>devops-sonar-test-repo</sonar.organization>
+</properties>
