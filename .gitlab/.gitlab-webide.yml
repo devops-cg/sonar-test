@@ -1,0 +1,6 @@
+terminal:
+  image:
+    name: alpine
+  before_script:
+    - apt-get update
+  script: sleep 60
